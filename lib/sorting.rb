@@ -17,7 +17,27 @@ module Sort
     accumulator += (left + right)
 
     return accumulator
+  end
 
+  def quicksort(a)
+    if a.length <=1
+      return a
+    end
+
+    pivot_index = a.length/2
+    pivot = a[pivot_index]
+    left = []
+    right = []
+
+    (a[0..pivot_index - 1] + a[pivot_index + 1..-1]).each do |element|
+      if element < pivot then
+        left.push(element)
+      else
+        right.push(element)
+      end
+    end
+
+    return quicksort(left) + [pivot] + quicksort(right)
   end
 
 end
