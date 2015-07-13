@@ -1,11 +1,5 @@
 # Common data structures, written from scratch
 
-# Originally implemented with the String.hash method, but this
-# resulted in weird hash collision behaviour, and ultimately
-# made the hash unreliable
-
-require 'digest/sha1'
-
 module DataStructures
   # Homebrew hashmap
   class MyHash
@@ -24,25 +18,25 @@ module DataStructures
       if @length == @size
         upscale
       end
-      hash = Digest::SHA1.hexdigest(key.to_s).to_i % @size
+      hash = key.to_s.intern.object_id % @size
       @val_arr[hash] = val
-      @key_arr[hash] = key.to_s
+      @key_arr[hash] = key.to_s.intern
       @length += 1
     end
 
     def delete(key)
-      hash = Digest::SHA1.hexdigest(key.to_s).to_i % @size
+      hash = key.to_s.intern.object_id % @size
       @val_arr[hash] = nil
       @key_arr[hash] = nil
     end
 
     def fetch(key)
-      hash = Digest::SHA1.hexdigest(key.to_s).to_i % @size
+      hash = key.to_s.intern.object_id % @size
       return @val_arr[hash]
     end
 
     def keys
-      return @key_arr.compact
+      return @key_arr.compact.map { |i| i.to_s }
     end
 
     def vals
