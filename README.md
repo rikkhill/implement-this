@@ -1,4 +1,4 @@
 # implement-this
-Home-made implementations of common algorithms, data structures, design patterns, etc.
+Home-made implementations of common algorithms, data structures, design patterns, exercises, etc.
 
-Ruby is clearly a ridiculous language to implement these things in, but it's readable and transparent enough to be illustrative.
+I don't actually use Ruby very much at all in real life, but I think the transparency of its inheritence system makes it good for these purposes.
