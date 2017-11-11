@@ -177,17 +177,37 @@ class Dutch
     a_rep = self.rep
     b_rep = b.rep
 
+    # We can directly check equality of the representation
+    # God Bless Ruby
     if a_rep == b_rep
       return 0
     end
 
+    # We can short-circuit this entire process if
+    # the numbers have different signs
+    if self.sign != b.sign
+      if self.sign = false
+        return -1
+      else
+        return 1
+      end
+    end
+
     loop do
       if counter.rep == a_rep
-        return -1
+        if self.sign == true
+          return -1
+        else
+          return 1
+        end
       end
 
       if counter.rep == b_rep
-        return 1
+        if self.sign == true
+          return 1
+        else
+          return -1
+        end
       end
 
       # Should never get here
