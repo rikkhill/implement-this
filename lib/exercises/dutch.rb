@@ -14,26 +14,33 @@
 #
 # - No points for speed or numerical efficiency
 
-class Dutch
+
+# Counter
+# An object with magnitude used to represent natural numbers
+class Counter
   include Comparable
 
-  attr_accessor :sign
+  def initialize(value = nil)
+    @magnitude = nil
 
-  def initialize(value=(), sign=true)
-    @representation = self.coerce_representation(value)
-    @sign = sign
+    if value.is_a?(Array) && value.flatten.shift.nil?
+      @magnitude = value
+    end
+
+    # We are totally allowed to use numerics when interpolating numerics
+    if value.is_a? Integer
+      (1..(value.abs)).each do
+        @magnitude = increment(@magnitude)
+      end
+    end
   end
 
-  # Get a deep copy of the representation
-  def rep
-    Marshal::load(Marshal.dump(@representation))
+  # Deep copy of the object's magnitude
+  def mag
+    Marshal::load(Marshal.dump(@magnitude))
   end
 
-  def clone
-    Dutch.new(@representation, @sign)
-  end
-
-  def increment(inner = [()])
+  def increment(inner = nil)
     [inner]
   end
 
@@ -41,189 +48,179 @@ class Dutch
     outer.shift
   end
 
-  def -@
-    Dutch.new(self, !@sign)
-  end
-
-  def zero
-    Dutch.new(())
-  end
-
-  def one
-    Dutch.new([()])
-  end
-
-  def coerce_representation a
-
-    rep = ()
-
-    if a.is_a? Dutch
-      rep = a.rep
-    end
-
-    if a.is_a? Array and a.flatten.shift.nil?
-      rep = a
-    end
-
-    # We're allowed to use integers when turning
-    # integers into something else, otherwise
-    # madness would reign
-    if a.is_a? Integer
-      for i in 1..a
-        rep = increment(rep)
-      end
-    end
-
-    rep
-
-  end
-
-  # It turns out you can't define a ++ method in Ruby
   def inc
-    @representation = increment(@representation)
-    self.to_s
+    @magnitude = increment(@magnitude)
+    self
   end
 
   def dec
-    @representation = decrement(@representation)
-    self.to_s
+    @magnitude = decrement(@magnitude)
+    self
+  end
+
+  def zero
+    Counter.new(nil)
+  end
+
+  def one
+    Counter.new([nil])
+  end
+
+  def zero?
+    @magnitude.nil?
+  end
+
+  def over
+    mag = self.mag
+
+    loop do
+      break if mag.nil?
+      mag = decrement(mag)
+      yield(mag)
+    end
+  end
+
+  def inspect
+    to_s
   end
 
   def to_s
 
-    # Cheating while I figure this out
-
     n = []
-
-    self.over { n.push([]) }
-
-    (@sign ? "" : "-") << n.length.to_s
+    over { n.push([]) }
+    n.length.to_s
 
   end
 
-  def over
-    rep = self.rep
-
-    loop do
-      break if rep.nil?
-      rep = decrement(rep)
-      yield
-    end
-  end
-
-
-  def inspect
-    self.to_s
-  end
-
-  def +(b)
-    b_rep = b.rep
-    self.over {
-      b_rep = increment(b_rep)
+  def +(other)
+    b_mag = other.mag
+    over {
+      b_mag = increment(b_mag)
     }
 
-    Dutch.new(b_rep)
+    Counter.new(b_mag)
 
   end
 
-  def *(b)
+  def *(other)
 
-    sign = self.sign == b.sign
-    cardinality = ()
-    self.over {
-      b.over {
+    cardinality = nil
+    over do
+      other.over do
         cardinality = increment(cardinality)
-      }
-    }
-
-    Dutch.new(cardinality, sign)
-
-  end
-
-  def -(b)
-
-    magnitude = zero
-    sign = true
-
-    if self > b
-      counter = Dutch.new(self)
-      while counter > b do
-        magnitude.inc
-        counter.dec
-      end
-    elsif self < b
-      sign = false
-      counter = Dutch.new(b)
-      while counter > self
-        magnitude.inc
-        counter.dec
       end
     end
 
-    return Dutch.new(magnitude.rep, sign)
+    Counter.new(cardinality)
 
   end
 
-  def /(b)
-    raise NotImplementedError
-  end
+  def <=>(other)
 
-  def <=>(b)
-    # We're also allowed to use numerical values here
-    # because the Comparable module requires it
-    max = self + b
-    counter = zero
+    max = self + other
 
-    a_rep = self.rep
-    b_rep = b.rep
+    return 0 if mag == other.mag
 
-    # We can directly check equality of the representation
-    # God Bless Ruby
-    if a_rep == b_rep
-      return 0
-    end
-
-    # We can short-circuit this entire process if
-    # the numbers have different signs
-    if self.sign != b.sign
-      if self.sign = false
-        return -1
-      else
-        return 1
-      end
-    end
-
-    loop do
-      if counter.rep == a_rep
-        if self.sign == true
-          return -1
-        else
-          return 1
-        end
-      end
-
-      if counter.rep == b_rep
-        if self.sign == true
-          return 1
-        else
-          return -1
-        end
-      end
+    max.over do |i|
+      return 1 if i == mag
+      return -1 if i == other.mag
 
       # Should never get here
-      if counter.rep == max.rep
-        raise RangeError
-      end
-
-      counter.inc
-
+      raise RangeError if i == max.mag
     end
 
+  end
+end
 
 
+# Dutch Integers
+class Dint
+  include Comparable
+
+  attr_accessor :positive, :negative
+  def initialize(value = nil, positive = true)
+    @positive = nil
+    @negative = nil
+
+    magnitude = Counter.new(value)
+    # If the value is negative or the sign boolean suggests so...
+    if (value.is_a?(Integer) && value.negative?) || !positive
+      @negative = magnitude
+      @positive = Counter.new
+    else
+      @positive = magnitude
+      @negative = Counter.new
+    end
+
+    if value.is_a? Dint
+      @positive = Counter.new(value.positive.mag)
+      @negative = Counter.new(value.negative.mag)
+    end
+  end
+
+
+  # Our integer has a positive component
+  def reduce_to_canonical
+    while !@positive.zero? && !@negative.zero?
+      @positive.dec
+      @negative.dec
+    end
 
   end
 
+  def inspect
+    to_s
+  end
+
+  def to_s
+    neg? ? ('-' << @negative.to_s) : @positive.to_s
+  end
+
+  def pos?
+    @negative.zero?
+  end
+
+  def neg?
+    !@negative.zero?
+  end
+
+  def <=>(other)
+    diff = self - other
+    return 0 if diff.positive == diff.negative
+    return -1 if diff.positive > diff.negative
+    return 1 if diff.positive < diff.negative
+
+    # nil if this somehow fails
+    nil
+  end
+
+  def -@
+    @positive, @negative = @negative, @positive
+  end
+
+  def +(other)
+    ret = Dint.new
+    ret.positive = @positive + other.positive
+    ret.negative = @negative + other.negative
+    ret.reduce_to_canonical
+    ret
+  end
+
+  def -(other)
+    ret = Dint.new
+    ret.positive = @positive + other.negative
+    ret.negative = @negative + other.positive
+    ret.reduce_to_canonical
+    ret
+  end
+
+  def *(other)
+    ret = Dint.new
+    ret.positive = @positive * (other.positive + other.negative)
+    ret.negative = @negative * (other.positive + other.negative)
+    ret.reduce_to_canonical
+    ret
+  end
 
 end
 

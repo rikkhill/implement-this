@@ -1,7 +1,7 @@
 require 'test/unit'
 require_relative '../lib/exercises/dutch'
 
-# Tests for Dutch Numbers
+# Tests for Dutch Integers
 
 # We can check this object satisfies the axioms for
 # a ring over the integers
@@ -9,18 +9,18 @@ require_relative '../lib/exercises/dutch'
 class TestIntegerRing < Test::Unit::TestCase
 
   def setup
-    @zero = Dutch.new(0)
-    @one = Dutch.new(1)
-    @two = Dutch.new(2)
-    @five = Dutch.new(5)
-    @ten = Dutch.new(10)
-    @sixtysix = Dutch.new(66)
-    @twohundred = Dutch.new(200)
+    @zero = Dint.new(0)
+    @one = Dint.new(1)
+    @two = Dint.new(2)
+    @five = Dint.new(5)
+    @ten = Dint.new(10)
+    @sixtysix = Dint.new(66)
+    @twohundred = Dint.new(200)
 
-    @neg_one = Dutch.new(1, false)
-    @neg_two = Dutch.new(2, false)
-    @neg_five = Dutch.new(5, false)
-    @neg_ten = Dutch.new(10, false)
+    @neg_one = Dint.new(1, false)
+    @neg_two = Dint.new(2, false)
+    @neg_five = Dint.new(5, false)
+    @neg_ten = Dint.new(10, false)
   end
 
   # ADDITION
@@ -34,13 +34,13 @@ class TestIntegerRing < Test::Unit::TestCase
 
   def test_positive_addition
     assert_equal(@one + @one, @two, 'One plus one is two')
-    assert_equal(@two + @two, Dutch.new(4), 'Two plus two is four')
-    assert_equal(@ten + @ten, Dutch.new(20), 'Ten plus ten is twenty')
+    assert_equal(@two + @two, Dint.new(4), 'Two plus two is four')
+    assert_equal(@ten + @ten, Dint.new(20), 'Ten plus ten is twenty')
   end
 
   def test_negative_addition
     assert_equal(@neg_one + @neg_one, @neg_two, '-1 + -1 = -2')
-    assert_equal(@neg_two + @neg_two, Dutch.new(-4), '-2 + -2 = -4')
+    assert_equal(@neg_two + @neg_two, Dint.new(-4), '-2 + -2 = -4')
     assert_equal(@neg_five + @neg_five, @neg_ten, '-5 + -5 = -10')
   end
 
@@ -65,21 +65,21 @@ class TestIntegerRing < Test::Unit::TestCase
   end
 
   def test_positive_multiplication
-    assert_equal(@five * @five, Dutch.new(25), '5 * 5 = 25')
-    assert_equal(@two * @two, Dutch.new(4), '2 * 2 = 4')
-    assert_equal(@ten * @ten, Dutch.new(100), '10 * 10 = 100')
+    assert_equal(@five * @five, Dint.new(25), '5 * 5 = 25')
+    assert_equal(@two * @two, Dint.new(4), '2 * 2 = 4')
+    assert_equal(@ten * @ten, Dint.new(100), '10 * 10 = 100')
   end
 
   def test_negative_multiplication
     assert_equal(@neg_one * @neg_one, @one, '-1 * -1 = 1')
-    assert_equal(@neg_two * @neg_two, Dutch.new(4), '-2 * -2 = 4')
-    assert_equal(@neg_five * @neg_five, Dutch.new(25), '-5 * -5 = 25')
+    assert_equal(@neg_two * @neg_two, Dint.new(4), '-2 * -2 = 4')
+    assert_equal(@neg_five * @neg_five, Dint.new(25), '-5 * -5 = 25')
   end
 
   def test_mixed_sign_multiplication
     assert_equal(@neg_one * @two, @neg_two, '-1 * 2 = -2')
     assert_equal(@neg_two * @five, @neg_ten, '-2 * 5 = -10')
-    assert_equal(@neg_five * @five, Dutch.new(25, false), '-5 * 5 = -25')
+    assert_equal(@neg_five * @five, Dint.new(25, false), '-5 * 5 = -25')
   end
 
   def test_multiplication_associativity
@@ -92,17 +92,17 @@ end
 class TestComparable < Test::Unit::TestCase
 
   def setup
-    @zero = Dutch.new(0)
+    @zero = Dint.new(0)
 
-    @one = Dutch.new(1)
-    @two = Dutch.new(2)
-    @five = Dutch.new(5)
-    @ten = Dutch.new(10)
+    @one = Dint.new(1)
+    @two = Dint.new(2)
+    @five = Dint.new(5)
+    @ten = Dint.new(10)
 
-    @neg_one = Dutch.new(1, false)
-    @neg_two = Dutch.new(2, false)
-    @neg_five = Dutch.new(5, false)
-    @neg_ten = Dutch.new(10, false)
+    @neg_one = Dint.new(1, false)
+    @neg_two = Dint.new(2, false)
+    @neg_five = Dint.new(5, false)
+    @neg_ten = Dint.new(10, false)
   end
 
   def test_less_than
