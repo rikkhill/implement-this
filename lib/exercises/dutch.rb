@@ -222,6 +222,11 @@ class Dint
     ret
   end
 
+  def /(other)
+    # Fuck knows...
+    
+  end
+
 end
 
 

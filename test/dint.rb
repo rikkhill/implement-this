@@ -55,6 +55,14 @@ class TestIntegerRing < Test::Unit::TestCase
     assert_equal((@one + @two) + @five, @one + (@two + @five), 'Additive associativity holds')
   end
 
+  # SUBTRACTION
+
+  def test_subtraction
+    assert_equal(@ten - @five, @five, '10 - 10 = 5')
+    assert_equal(@neg_ten - @neg_five, @neg_five, '-10 - -5 = -5')
+    assert_equal(@five - @ten, @neg_five, '5 - 10 = -5')
+  end
+
   # MULTIPLICATION
 
   def test_multiplicative_identity
@@ -87,6 +95,14 @@ class TestIntegerRing < Test::Unit::TestCase
     assert_equal((@one * @two) * @five, @one * (@two * @five), 'multiplicative associativity holds')
   end
 
+  def test_division_basic
+    assert_equal(@five / @five, @one, '5 / 5 = 1')
+    assert_equal(@ten / @five, @two, '10 / 5 = 2')
+    assert_equal(@ten / @two, @five, '10 / 2 = 5')
+    assert_equal(@ten / @neg_two, @neg_five, '10 / -2 = -5')
+    assert_equal(@neg_ten / @neg_two, @five, '-10 / -2 = 5')
+  end
+
 end
 
 class TestComparable < Test::Unit::TestCase
@@ -106,11 +122,9 @@ class TestComparable < Test::Unit::TestCase
   end
 
   def test_less_than
-
     assert(@one < @two, 'one is less than two, positive')
     assert(@neg_two < @neg_one, '-2 < -1, negative')
     assert(@neg_two < @one, '-2 < 1, mixed sign')
-
   end
 
 end
