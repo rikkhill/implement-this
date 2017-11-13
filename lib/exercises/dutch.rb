@@ -216,8 +216,8 @@ class Dint
 
   def *(other)
     ret = Dint.new
-    ret.positive = @positive * (other.positive + other.negative)
-    ret.negative = @negative * (other.positive + other.negative)
+    ret.positive = (@positive * other.positive) + (@negative * other.negative)
+    ret.negative = (@negative * other.positive) + (@positive * other.negative)
     ret.reduce_to_canonical
     ret
   end
