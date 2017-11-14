@@ -173,19 +173,23 @@ class Dint
   end
 
   def to_s
+    self.reduce_to_canonical
     neg? ? ('-' << @negative.to_s) : @positive.to_s
   end
 
   def pos?
+    self.reduce_to_canonical
     @negative.zero?
   end
 
   def neg?
+    self.reduce_to_canonical
     !@negative.zero?
   end
 
   def <=>(other)
     diff = self - other
+    diff.reduce_to_canonical
     return 0 if diff.positive == diff.negative
     return -1 if diff.positive > diff.negative
     return 1 if diff.positive < diff.negative
@@ -202,7 +206,6 @@ class Dint
     ret = Dint.new
     ret.positive = @positive + other.positive
     ret.negative = @negative + other.negative
-    ret.reduce_to_canonical
     ret
   end
 
@@ -210,7 +213,6 @@ class Dint
     ret = Dint.new
     ret.positive = @positive + other.negative
     ret.negative = @negative + other.positive
-    ret.reduce_to_canonical
     ret
   end
 
@@ -218,13 +220,37 @@ class Dint
     ret = Dint.new
     ret.positive = (@positive * other.positive) + (@negative * other.negative)
     ret.negative = (@negative * other.positive) + (@positive * other.negative)
-    ret.reduce_to_canonical
     ret
   end
 
   def /(other)
-    # Fuck knows...
-    
+    ret = Dint.new
+
+    p_count = Counter.new
+    n_count = Counter.new
+
+    @positive.over do
+      p_count.inc
+      n_count.inc
+      ret.positive.inc if p_count == other.positive
+      ret.negative.inc if n_count == other.negative
+      p_count = p_count.zero if p_count == other.positive
+      n_count = n_count.zero if n_count == other.negative
+    end
+
+    p_count = p_count.zero
+    n_count = n_count.zero
+
+    @negative.over do
+      n_count.inc
+      p_count.inc
+      ret.negative.inc if n_count == other.positive
+      ret.positive.inc if p_count == other.negative
+      p_count = p_count.zero if p_count == other.negative
+      n_count = n_count.zero if n_count == other.positive
+    end
+
+    ret
   end
 
 end

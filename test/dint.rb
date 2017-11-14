@@ -99,8 +99,10 @@ class TestIntegerRing < Test::Unit::TestCase
     assert_equal(@five / @five, @one, '5 / 5 = 1')
     assert_equal(@ten / @five, @two, '10 / 5 = 2')
     assert_equal(@ten / @two, @five, '10 / 2 = 5')
+    assert_equal(@two / @ten, @zero, '10 / 2 = 5')
     assert_equal(@ten / @neg_two, @neg_five, '10 / -2 = -5')
     assert_equal(@neg_ten / @neg_two, @five, '-10 / -2 = 5')
+    assert_equal((@ten - @ten - @ten) / @neg_two, @five, '(-5 + -5) / -2 = 5')
   end
 
 end

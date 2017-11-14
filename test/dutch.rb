@@ -85,6 +85,7 @@ class TestIntegerRing < Test::Unit::TestCase
   def test_multiplication_associativity
     # This should hold for all n in Z, but lets just test this one...
     assert_equal((@one * @two) * @five, @one * (@two * @five), 'multiplicative associativity holds')
+    assert_equal((@one * @neg_two) * @five, @one * (@neg_two * @five), 'multiplicative associativity holds')
   end
 
 end
